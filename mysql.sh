@@ -33,12 +33,19 @@ CHECK_ROOT_USER(){
 echo "Script started executing at $(date)" | tee -a $LOG_FILE
 CHECK_ROOT_USER
 
-dnf install mysql-server -y
+dnf install mysql-server -y &>> $LOG_FILE
 VALIDATE $? "Installing MySql Server"
-systemctl enable mysqld
+systemctl enable mysqld &>> $LOG_FILE
 VALIDATE $? "Enabled MySql Server"
-systemctl start mysqld
+systemctl start mysqld &>> $LOG_FILE
 VALIDATE $? "Started MySql Server"
 
-mysql_secure_installation --set-root-pass ExpenseApp@1
-VALIDATE $? "seting up root password"
+mysql -h mysql.chaitu4d1.shop -u root -pExpenseApp@1 -e "show databases;" &>> $LOG_FILE
+if [ $? -ne 0 ]; then
+    echo -e "MYSQL root password is not set up, setting up now" &>> $LOG_FILE
+    mysql_secure_installation --set-root-pass ExpenseApp@1
+    VALIDATE $? "seting up root password"
+else
+    echo -e "MySql password is already set.... $Y SKIPPING $N" | tee -a $LOG_FILE
+fi
+

@@ -41,6 +41,7 @@ systemctl start mysqld &>> $LOG_FILE
 VALIDATE $? "Started MySql Server"
 
 mysql -h mysql.chaitu4d1.shop -u root -pExpenseApp@1 -e "show databases;" &>> $LOG_FILE
+
 if [ $? -ne 0 ]; then
     echo -e "MYSQL root password is not set up, setting up now" &>> $LOG_FILE
     mysql_secure_installation --set-root-pass ExpenseApp@1
